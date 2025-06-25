@@ -101,14 +101,13 @@
             
             mkdir -p $out/bin
             
-            # Install Rust binaries
-            find target/release -maxdepth 1 -type f -executable | while read bin; do
-              if [[ -f "$bin" && ! "$bin" =~ \.(so|dylib|dll)$ ]]; then
-                cp "$bin" $out/bin/
-              fi
-            done
+            # Install specific Rust binaries
+            # create-farm binary (the main CLI tool)
+            if [ -f "target/release/create-farm" ]; then
+              install -m755 target/release/create-farm $out/bin/create-farm
+            fi
             
-            # Install Node.js CLI if it exists
+            # Install Node.js CLI wrapper
             if [ -d "packages/cli" ]; then
               mkdir -p $out/lib/farm
               cp -r packages/cli/* $out/lib/farm/
@@ -120,6 +119,14 @@
             EOF
               chmod +x $out/bin/farm
             fi
+            
+            # Install Node.js bindings (shared libraries for Node.js)
+            mkdir -p $out/lib
+            find target/release -name "*.so" -o -name "*.dylib" -o -name "*.node" | while read lib; do
+              if [ -f "$lib" ]; then
+                install -m755 "$lib" $out/lib/
+              fi
+            done
             
             runHook postInstall
           '';
