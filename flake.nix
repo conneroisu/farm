@@ -78,7 +78,7 @@
             pnpm install --frozen-lockfile
             
             # Build TypeScript packages
-            pnpm run build || true
+            pnpm run build
           '';
 
           # We need to provide a fake Cargo.lock hash since this is a workspace
@@ -170,12 +170,6 @@
             # Set up environment variables
             export RUST_LOG=info
             export NODE_ENV=development
-            
-            # Ensure pnpm is available
-            if ! command -v pnpm &> /dev/null; then
-              echo "Installing pnpm globally..."
-              npm install -g pnpm
-            fi
           '';
 
           # Environment variables for development
